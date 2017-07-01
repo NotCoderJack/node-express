@@ -1,9 +1,9 @@
 /*
-*   test demo for redis 
+*   test demo for redis
 */
 const client = require('./index');
 client.set('helo', 'world');
-client.get('helo', (rs) =>{
+client.get('helo', (rs) => {
     console.log(rs);
 })
 
