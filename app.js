@@ -4,9 +4,11 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var connectMongo = require('connect-mongo'); // or connect-redis
+var session = require('express-session');
 
 var app = express();
-require('./routes/routes.js')(app);
+
 // view engine setup
 console.log(__dirname)
 app.set('views', path.join(__dirname, 'views'));
@@ -20,6 +22,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const MongoStore = connectMongo(session);
+app.use(session({
+    name: 'SID',
+    secret: 'SID',
+    resave: true,
+    saveUninitialized: false,
+    cookie: {
+			httpOnly: false,
+		    secure:   false,
+		    maxAge:   365 * 24 * 60 * 60 * 1000,
+	},
+    //缓存session
+    store: new MongoStore({
+        url: 'mongodb://localhost:27017/brackets'
+    })
+}))
+require('./routes/routes.js')(app);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -30,12 +49,7 @@ app.use(function(req, res, next) {
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  //res.locals.message = err.message;
   res.locals.message = '系统出现故障，商务合作请电话联系!'
-  //res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });

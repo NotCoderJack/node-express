@@ -2,12 +2,11 @@
 /*
 * Model for Mongoose , just a demo
 */
-import mongoose from 'mongoose'
+const mongoose = require('mongoose');
 const Scheme = mongoose.Schema;
 const userSchema = new Schema({
     userName: String,
     password: String,
-    id: Number
 });
 
 userSchema.index({id: 1});
